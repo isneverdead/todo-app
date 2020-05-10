@@ -14,3 +14,4 @@ export const firebase = Firebase
     appId: "1:820343771205:web:d773e58be4a11e2f9f932c"
   })
 export const db = firebase.firestore()
+export const auth = firebase.auth()

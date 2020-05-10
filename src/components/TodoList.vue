@@ -8,7 +8,8 @@
     
     <transition-group name="fade">
     <!-- <transition-group name="fade" enter-active-class="animated fadeInUp faster" leave-active-class="animated fadeOutDown fast"> -->
-    <div class="todo-item" v-for="todo in todosFiltered" :key="todo.id" >
+
+    <div class="todo-item" v-for="todo in todos" :key="todo.id" >
         
         <div class="todo-item-left">
             <button class="todo-item-label" :class="{ completed : todo.completed }" @click="check(todo)">[___]</button>
@@ -48,11 +49,16 @@
         </div>
 
     </div>
+    <div>
+        <button @click="signOut">logout</button>
+    </div>
   </div>
 </template>
 
 <script>
 import { db } from '../firebaseSetting'
+import { auth } from '../firebaseSetting'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'TodoList',
@@ -90,7 +96,18 @@ export default {
         showClearCompletedButton() {
             return this.todos.filter(todo => todo.completed).length > 0
         },
+        ...mapGetters({
+            currentUser: 'lihatUser'
+        }),
+        nextRoute() {
+            return this.$route.query.redirect || '/login'
+        }
         
+    },
+    mounted() {
+        if (this.currentUser == null) {
+            this.$router.replace(this.nextRoute)
+        }
     },
     directives: {
         focus: {
@@ -166,8 +183,15 @@ export default {
         },
         finishedEdit(data) {
             this.todos.splice(data.index, 1, data.todo)
+        },
+        signOut() {
+            auth.signOut()
+            console.log("logout")
+            console.log(this.currentUser)
+            this.$router.replace(this.nextRoute)
         }
     },
+    
 }
 </script>
 
