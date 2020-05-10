@@ -28,8 +28,12 @@
           <h2>Sign in</h2>
           <input v-model="email" type="text" placeholder="Email"> <br>
           <input v-model="password" type="password" placeholder="Password"> <br>
-          <button @click="login" type="submit">Login</button>
-          <p>Dont have account? daftar disini <button @click="gotoSignUp">Register</button> </p>
+          <b-message type="is-danger" v-if="error">
+            {{ error }}
+          </b-message>
+          <button @click="login" class="button is-success is-outlined">Login</button>
+
+          <p>Dont have account? daftar disini <button @click="gotoSignUp" class="button is-success is-outlined">Register</button> </p>
           
         </div>
     </div>
@@ -64,6 +68,7 @@ export default {
             email: '',
             password: '',
             boxMsg: '',
+            error: null
         
         }
   },
@@ -87,10 +92,12 @@ export default {
         .auth()
         .signInWithEmailAndPassword(this.email, this.password)
         .then(
-            (user) => {
+          (user) => {
             this.$router.replace({name: 'Home' })
-        })
-      },
+        },(err) => {
+            this.error = err.message
+          }
+      )},
       gotoSignUp() {
         this.$router.replace('/sign-up')
       },

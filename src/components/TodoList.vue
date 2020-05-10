@@ -9,10 +9,13 @@
     <transition-group name="fade">
     <!-- <transition-group name="fade" enter-active-class="animated fadeInUp faster" leave-active-class="animated fadeOutDown fast"> -->
 
-    <div class="todo-item" v-for="todo in todos" :key="todo.id" >
-        
+    <div class="todo-item" v-for="todo in todosFiltered" :key="todo.id" >
+    
         <div class="todo-item-left">
-            <button class="todo-item-label" :class="{ completed : todo.completed }" @click="check(todo)">[___]</button>
+            <button class="todo-item-label" @click="check(todo)">
+                <i v-if="todo.completed" class="gg-check"  aria-hidden="true"></i>
+                <i v-else class="gg-shape-circle" aria-hidden="true"></i>
+                </button>
             <!-- <input @click="check(todo)" type="checkbox" v-model="todo.completed" > -->
             
             <div v-if="!todo.editing" @dblclick="editTodo(todo)" 
@@ -50,7 +53,7 @@
 
     </div>
     <div>
-        <button @click="signOut">logout</button>
+        <button @click="signOut" class="button is-success is-outlined">logout</button>
     </div>
   </div>
 </template>
@@ -67,10 +70,11 @@ export default {
     return {
         todo: '',
         todos: [],
-        
+        icon: '',
         checkAll: false,
         beforeEditCache: '',
         filter: 'all',
+        isFullPage: false
         }
     },
     firestore: {
@@ -101,6 +105,14 @@ export default {
         }),
         nextRoute() {
             return this.$route.query.redirect || '/login'
+        },
+        icono() {
+            if(this.todo.completed) {
+                this.icon = 'fa fa-square'
+            } else {
+                this.icon = 'fa fa-check'
+            }
+            return this.icon
         }
         
     },
@@ -189,7 +201,8 @@ export default {
             console.log("logout")
             console.log(this.currentUser)
             this.$router.replace(this.nextRoute)
-        }
+        },
+        
     },
     
 }
@@ -256,5 +269,40 @@ export default {
     
     .active {
         background: lightgreen;
+    }
+
+    .gg-check {
+    box-sizing: border-box;
+    position: relative;
+    display: block;
+    transform: scale(var(--ggs,2));
+    width: 22px;
+    height: 22px;
+    border: 2px solid transparent;
+    border-radius: 100px
+    }
+    .gg-check::after {
+        content: "";
+        display: block;
+        box-sizing: border-box;
+        position: absolute;
+        left: 3px;
+        top: -1px;
+        width: 6px;
+        height: 10px;
+        border-width: 0 2px 2px 0;
+        border-style: solid;
+        transform-origin: bottom left;
+        transform: rotate(45deg)
+    }
+    .gg-shape-circle {
+    box-sizing: border-box;
+    position: relative;
+    display: block;
+    transform: scale(var(--ggs,1));
+    width: 22px;
+    height: 22px;
+    border: 3px solid;
+    border-radius: 100px
     }
 </style>

@@ -3,10 +3,30 @@
     <img alt="Vue logo" src="../assets/logo.png">
     <!-- <HelloWorld msg="Welcome to Your Vue.js App"/> -->
     <!-- <TodoList/> -->
-    <h2>Register</h2> 
-    <input v-model="email" @keyup.enter="signUp" type="text" placeholder="Email"> <br>
-    <input v-model="password" @keyup.enter="signUp" type="password" placeholder="Password"> <br>
-    <button @click="signUp" type="submit">Sign Up</button>
+    <h1>Register</h1> 
+    <div class="form">
+      <div class="tile is-vertical is-4" >
+      <b-field label="Email">
+          <b-input type="email"
+          placeholder="Email"
+              v-model="email"
+              maxlength="30">
+          </b-input>
+      </b-field>
+      <b-field label="password">
+          <b-input type="password"
+          placeholder="password"
+              v-model="password"
+              maxlength="30">
+          </b-input>
+      </b-field>
+      <b-message type="is-danger" v-if="error">
+        {{ error }}
+      </b-message>
+      </div>
+    <button class="button is-success is-outlined" @click="signUp" type="submit">Sign Up</button>
+    </div>
+    <p>Sudah punya akun? yaudah masuk disini <button @click="gotoLogin" class="button is-success is-outlined">Login</button> </p>
   </div>
 </template>
 
@@ -24,6 +44,7 @@ export default {
         email: '',
         password: '',
         boxMsg: '',
+        error: null
         
       }
   },
@@ -35,12 +56,12 @@ export default {
         .then(
             (user) => {
             this.boxMsg = 'Akun anda berhasil didaftarkan!'
-            this.popUpMessage()
+            // this.popUpMessage()
             if (user == null) this.gotoLogin()
             console.log(user)
         },  (err) => {
-            this.boxMsg = err.message
-            this.popUpMessage()
+            this.error = err.message
+            // this.popUpMessage()
         })
       },
       popUpMessage() {
@@ -76,10 +97,16 @@ export default {
     }
     p {
         margin-top: 40px;
-        font-size: 13px;
+        font-size: 23px;
     }
     p a {
         text-decoration: underline;
         cursor: pointer;
+    }
+    .form {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
     }
 </style>

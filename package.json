@@ -9,6 +9,7 @@
   "dependencies": {
     "bootstrap": "^4.4.1",
     "bootstrap-vue": "^2.13.1",
+    "buefy": "^0.8.0",
     "core-js": "^3.6.4",
     "firebase": "^7.14.2",
     "vue": "^2.6.11",
@@ -21,6 +22,7 @@
     "@vue/cli-plugin-router": "~4.3.0",
     "@vue/cli-plugin-vuex": "~4.3.0",
     "@vue/cli-service": "~4.3.0",
+    "vue-cli-plugin-buefy": "~0.3.7",
     "vue-template-compiler": "^2.6.11"
   },
   "browserslist": [

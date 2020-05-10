@@ -23,6 +23,13 @@ import { firebase } from './firebaseSetting'
 // export const db = app.firestore()
 // export var Firebase = fi.firestore()
 import { firestorePlugin } from 'vuefire'
+import Buefy from 'buefy'
+import 'buefy/dist/buefy.css'
+
+
+Vue.use(Buefy)
+
+Vue.use(Buefy)
 
 Vue.use(firestorePlugin)
 Vue.config.productionTip = false
