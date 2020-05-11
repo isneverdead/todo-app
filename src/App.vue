@@ -1,8 +1,49 @@
 <template>
   <div id="app">
+    <!-- <section>
+      <b-modal :active.sync="isComponentModalActive"
+                has-modal-card
+                trap-focus
+                :destroy-on-hide="true"
+                aria-role="dialog"
+                aria-modal>
+                <b-notification
+                    type="is-success"
+                    has-icon>
+                    {{ modalMsg }}
+                <button @click="closePopUp">close</button>
+                </b-notification>
+      </b-modal>
+    </section> -->
     <router-view/>
   </div>
 </template>
+<script>
+import { mapGetters } from 'vuex'
+export default {
+  computed: {
+    ...mapGetters( {
+      isComponentModalActive: 'lihatModalStatus',
+      modalMsg: 'lihatModalMsg'
+    }),
+  },
+  watch: {
+    isComponentModalActive() {
+      if (this.isComponentModalActive) this.success()
+      this.$store.commit('updateModal', {status: false, msg: null})
+    }
+  },
+  methods: {
+    success() {
+        this.$buefy.notification.open({
+            message: this.modalMsg,
+            type: 'is-success'
+        })
+    },
+  },
+  
+}
+</script>
 
 <style>
 #app {

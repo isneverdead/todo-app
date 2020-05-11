@@ -1,6 +1,5 @@
 <template>
   <div>
-
     <div v-if="loading">
       <div class="loader loader--style1" title="0">
         <svg version="1.1" id="loader-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
@@ -22,20 +21,39 @@
       </div>
     </div>
 
+
     <div v-else>
         <div class="login">
           <img alt="Vue logo" src="../assets/logo.png">
           <h2>Sign in</h2>
-          <input v-model="email" type="text" placeholder="Email"> <br>
-          <input v-model="password" type="password" placeholder="Password"> <br>
+          <div class="tile is-vertical is-4" @keyup.enter="login">
+          <b-field label="Email">
+              <b-input type="email"
+              placeholder="Email"
+                  v-model="email"
+                  
+                  
+                  maxlength="30">
+              </b-input>
+          </b-field>
+          <b-field label="password">
+              <b-input type="password"
+              placeholder="password"
+                  v-model="password"
+                  
+                  
+                  maxlength="30">
+              </b-input>
+          </b-field>
           <b-message type="is-danger" v-if="error">
             {{ error }}
           </b-message>
-          <button @click="login" class="button is-success is-outlined">Login</button>
-
-          <p>Dont have account? daftar disini <button @click="gotoSignUp" class="button is-success is-outlined">Register</button> </p>
+          </div>
+          <button v-if="!loadingButton" @click="login" class="button is-success is-outlined">Login</button>
+          <button v-else class="button is-success is-small is-loading">Loading</button>
           
         </div>
+          <p>Dont have account? daftar disini <button @click="gotoSignUp" class="button is-small is-success is-outlined">Register</button> </p>
     </div>
   </div>
 </template>
@@ -47,7 +65,8 @@ import HelloWorld from '@/components/HelloWorld.vue'
 import * as firebase from 'firebase/app'
 import 'firebase/auth'
 
-import { mapGetters } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
+
 
 export default {
   name: 'Login',
@@ -68,7 +87,8 @@ export default {
             email: '',
             password: '',
             boxMsg: '',
-            error: null
+            error: null,
+            loadingButton: false
         
         }
   },
@@ -88,14 +108,16 @@ export default {
   },
   methods: {
       login() {
-        firebase
-        .auth()
+        this.loadingButton = true
+        firebase.auth()
         .signInWithEmailAndPassword(this.email, this.password)
         .then(
           (user) => {
             this.$router.replace({name: 'Home' })
+            this.$store.commit('updateModal', {status: true, msg: 'anda berhasil'})
         },(err) => {
             this.error = err.message
+            this.loadingButton = false
           }
       )},
       gotoSignUp() {
@@ -108,6 +130,10 @@ export default {
 <style scoped>
     .login {
         margin-top: 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
     }
     input {
         margin: 10px 0;
@@ -121,7 +147,7 @@ export default {
     }
     p {
         margin-top: 40px;
-        font-size: 23px;
+        font-size: 1rem;
     }
     p a {
         text-decoration: underline;

@@ -5,11 +5,13 @@
     <!-- <TodoList/> -->
     <h1>Register</h1> 
     <div class="form">
-      <div class="tile is-vertical is-4" >
+      <div class="tile is-vertical is-4" @keyup.enter="signUp">
       <b-field label="Email">
           <b-input type="email"
           placeholder="Email"
               v-model="email"
+              
+              
               maxlength="30">
           </b-input>
       </b-field>
@@ -17,16 +19,18 @@
           <b-input type="password"
           placeholder="password"
               v-model="password"
+              
+              
               maxlength="30">
           </b-input>
       </b-field>
-      <b-message type="is-danger" v-if="error">
-        {{ error }}
+      <b-message type="is-danger" v-if="msg">
+        {{ msg }}
       </b-message>
       </div>
-    <button class="button is-success is-outlined" @click="signUp" type="submit">Sign Up</button>
     </div>
-    <p>Sudah punya akun? yaudah masuk disini <button @click="gotoLogin" class="button is-success is-outlined">Login</button> </p>
+    <button class="button is-success is-small is-outlined" @click="signUp" type="submit">Sign Up</button>
+    <p>Sudah punya akun? yaudah masuk disini <button @click="gotoLogin" class="button is-success is-small  is-outlined">Login</button> </p>
   </div>
 </template>
 
@@ -44,7 +48,7 @@ export default {
         email: '',
         password: '',
         boxMsg: '',
-        error: null
+        msg: null
         
       }
   },
@@ -55,12 +59,13 @@ export default {
         .createUserWithEmailAndPassword(this.email, this.password)
         .then(
             (user) => {
-            this.boxMsg = 'Akun anda berhasil didaftarkan!'
+            // this.boxMsg = 'Akun anda berhasil didaftarkan!'
             // this.popUpMessage()
-            if (user == null) this.gotoLogin()
+            this.$store.commit('updateModal', {status: true, msg: 'Akun anda berhasil didaftarkan'})  
+            this.$router.replace('/sign-up')
             console.log(user)
         },  (err) => {
-            this.error = err.message
+            this.msg = err.message
             // this.popUpMessage()
         })
       },
@@ -97,7 +102,7 @@ export default {
     }
     p {
         margin-top: 40px;
-        font-size: 23px;
+        font-size: 1rem;
     }
     p a {
         text-decoration: underline;
