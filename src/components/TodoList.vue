@@ -4,33 +4,32 @@
     <h1>Vue ToDo List</h1>
     
     <input type="text" class="todo-input" placeholder="What's your plan?"
-    v-model="todo" @keyup.enter="addTodo">
-    
-    <transition-group name="fade">
+    v-model="todo" @keyup.enter="addTodo">    
     <!-- <transition-group name="fade" enter-active-class="animated fadeInUp faster" leave-active-class="animated fadeOutDown fast"> -->
-
-    <div class="todo-item" v-for="todo in todosFiltered" :key="todo.id" >
-    
-        <div class="todo-item-left">
-            <button class="todo-item-label" @click="check(todo)">
-                <i v-if="todo.completed" class="gg-check"  aria-hidden="true"></i>
-                <i v-else class="gg-shape-circle" aria-hidden="true"></i>
-                </button>
-            <!-- <input @click="check(todo)" type="checkbox" v-model="todo.completed" > -->
-            
-            <div v-if="!todo.editing" @dblclick="editTodo(todo)" 
-            class="todo-item-label" :class="{ completed : todo.completed }">{{ todo.title }}</div>
-            
-            <input v-else class="todo-item-edit" type="text" 
-            v-model="todo.title" @blur="doneEdit(todo)" 
-            @keyup.enter="doneEdit(todo)" @keyup.esc="cancelEdit(todo)"
-            v-focus>
-        </div>
+    <transition-group name="fade">
+        <div  class="todo-item" v-for="todo in todosFiltered" :key="todo.id" >
         
-        <div class="remove-item" @click="removeTodo(todo.id)">
-            &times;
-        </div>    
-    </div>
+            <div class="todo-item-left">
+                <button class="todo-item-label" @click="check(todo)">
+                    <i v-if="todo.completed" class="gg-check"  aria-hidden="true"></i>
+                    <i v-else class="gg-shape-circle" aria-hidden="true"></i>
+                    </button>
+                <!-- <input @click="check(todo)" type="checkbox" v-model="todo.completed" > -->
+                
+                <div v-if="!todo.editing" @dblclick="editTodo(todo)" 
+                class="todo-item-label" :class="{ completed : todo.completed }">{{ todo.title }}</div>
+                
+                <input v-else class="todo-item-edit" type="text" 
+                v-model="todo.title" @blur="doneEdit(todo)" 
+                @keyup.enter="doneEdit(todo)" @keyup.esc="cancelEdit(todo)"
+                v-focus>
+            </div>
+            
+            <div class="remove-item" @click="removeTodo(todo.id)">
+                &times;
+            </div>    
+
+        </div>
     </transition-group>
 
     <div class="extra-container">
@@ -50,8 +49,8 @@
         <div> 
             <button v-if="showClearCompletedButton" @click="clearCompleted">Clear Completed</button>
         </div>
-
     </div>
+
     <div>
         <button @click="signOut" class="button is-success is-outlined">logout</button>
     </div>
@@ -59,8 +58,7 @@
 </template>
 
 <script>
-import { db } from '../firebaseSetting'
-import { auth } from '../firebaseSetting'
+import { db, auth } from '../firebaseSetting'
 import { mapGetters } from 'vuex'
 
 export default {
@@ -74,12 +72,12 @@ export default {
         checkAll: false,
         beforeEditCache: '',
         filter: 'all',
-        isFullPage: false
         }
     },
     firestore: {
-        todos: db.collection('todos'),
+        todos: db.collection('todos').orderBy('created'),
         
+
     },
     computed: {
         remaining() {
@@ -120,6 +118,7 @@ export default {
         if (this.currentUser == null) {
             this.$router.replace(this.nextRoute)
         }
+        
     },
     directives: {
         focus: {
@@ -134,11 +133,13 @@ export default {
                 return
             }
             const ref = db.collection('todos').doc()
+
             ref.set({
                 id: ref.id,
                 title: this.todo,
                 completed: false,
                 editing: false,
+                created: new Date()
             })
             this.todo = ''
         },
@@ -155,7 +156,8 @@ export default {
                 id: ref.id,
                 title: todo.title,
                 completed: false,
-                editing: false
+                editing: false,
+                created: todo.created
             })
         },
         cancelEdit(todo) {
@@ -172,7 +174,8 @@ export default {
                 id: ref.id,
                 title: todo.title,
                 completed: !todo.completed,
-                editing: false
+                editing: false,
+                created: todo.created
             })
         },
         checkAllTodos() {
@@ -184,7 +187,8 @@ export default {
                     id: ref.id,
                     title: todo.title,
                     completed: this.checkAll,
-                    editing: false
+                    editing: false,
+                    created: todo.created
                 })
             })
         },
@@ -305,4 +309,74 @@ export default {
     border: 3px solid;
     border-radius: 100px
     }
+
+
+    @keyframes ldio-ski5n9k737b-1 {
+        0% { transform: rotate(0deg) }
+       50% { transform: rotate(-45deg) }
+      100% { transform: rotate(0deg) }
+    }
+    @keyframes ldio-ski5n9k737b-2 {
+        0% { transform: rotate(180deg) }
+       50% { transform: rotate(225deg) }
+      100% { transform: rotate(180deg) }
+    }
+    .ldio-ski5n9k737b > div:nth-child(2) {
+      transform: translate(-15px,0);
+    }
+    .ldio-ski5n9k737b > div:nth-child(2) div {
+      position: absolute;
+      top: 40.199999999999996px;
+      left: 40.199999999999996px;
+      width: 120.6px;
+      height: 60.3px;
+      border-radius: 120.6px 120.6px 0 0;
+      background: #2bde73;
+      animation: ldio-ski5n9k737b-1 1s linear infinite;
+      transform-origin: 60.3px 60.3px
+    }
+    .ldio-ski5n9k737b > div:nth-child(2) div:nth-child(2) {
+      animation: ldio-ski5n9k737b-2 1s linear infinite
+    }
+    .ldio-ski5n9k737b > div:nth-child(2) div:nth-child(3) {
+      transform: rotate(-90deg);
+      animation: none;
+    }@keyframes ldio-ski5n9k737b-3 {
+        0% { transform: translate(190.95px,0); opacity: 0 }
+       20% { opacity: 1 }
+      100% { transform: translate(70.35px,0); opacity: 1 }
+    }
+    .ldio-ski5n9k737b > div:nth-child(1) {
+      display: block;
+    }
+    .ldio-ski5n9k737b > div:nth-child(1) div {
+      position: absolute;
+      top: 92.46px;
+      left: -8.04px;
+      width: 16.08px;
+      height: 16.08px;
+      border-radius: 50%;
+      background: #ffd14f;
+      animation: ldio-ski5n9k737b-3 1s linear infinite
+    }
+    .ldio-ski5n9k737b > div:nth-child(1) div:nth-child(1) { animation-delay: -0.67s }
+    .ldio-ski5n9k737b > div:nth-child(1) div:nth-child(2) { animation-delay: -0.33s }
+    .ldio-ski5n9k737b > div:nth-child(1) div:nth-child(3) { animation-delay: 0s }
+    .loadingio-spinner-bean-eater-sebx2tpg1ah {
+      width: 201px;
+      height: 201px;
+      display: inline-block;
+      overflow: hidden;
+      background: none;
+    }
+    .ldio-ski5n9k737b {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform: translateZ(0) scale(1);
+      backface-visibility: hidden;
+      transform-origin: 0 0; /* see note above */
+    }
+    .ldio-ski5n9k737b div { box-sizing: content-box; }
+    /* generated by https://loading.io/ */
 </style>
