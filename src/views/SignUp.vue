@@ -1,9 +1,9 @@
 <template>
   <div class="signup">
+    <!-- logo vue  -->
     <img alt="Vue logo" src="../assets/logo.png">
-    <!-- <HelloWorld msg="Welcome to Your Vue.js App"/> -->
-    <!-- <TodoList/> -->
-    <h1>Register</h1> 
+    <h1 style="margin: 20px 0 20px 0; font-size: 2.5em" >Register</h1> 
+    <!-- form register  -->
     <div class="form">
       <div class="tile is-vertical is-4" @keyup.enter="signUp">
       <b-field label="Email">
@@ -15,29 +15,31 @@
               maxlength="30">
           </b-input>
       </b-field>
-      <b-field label="password">
+      <b-field label="Password">
           <b-input type="password"
-          placeholder="password"
+          placeholder="Password"
               v-model="password"
               
               
               maxlength="30">
           </b-input>
       </b-field>
+      <!-- error message box -->
       <b-message type="is-danger" v-if="msg">
         {{ msg }}
       </b-message>
       </div>
     </div>
+    <!-- tombol untuk ke halaman login  -->
     <button class="button is-success is-small is-outlined" @click="signUp" type="submit">Sign Up</button>
-    <p>Sudah punya akun? yaudah masuk disini <button @click="gotoLogin" class="button is-success is-small  is-outlined">Login</button> </p>
+    <p>Sudah punya akun?</p>
+    <button @click="gotoLogin" class="button is-success is-small is-outlined">Login</button>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
 import HelloWorld from '@/components/HelloWorld.vue'
-// import { firebase } from '../firebaseSetting'
 import * as firebase from 'firebase/app'
 import 'firebase/auth'
 
@@ -47,40 +49,28 @@ export default {
       return {
         email: '',
         password: '',
-        boxMsg: '',
         msg: null
         
       }
   },
   methods: {
+    // method mendaftarkan user ke firebase 
       signUp() {
         firebase
         .auth()
         .createUserWithEmailAndPassword(this.email, this.password)
         .then(
             (user) => {
-            // this.boxMsg = 'Akun anda berhasil didaftarkan!'
-            // this.popUpMessage()
+              // mengisi variabel pop up jika pendaftaran berhasil
             this.$store.commit('updateModal', {status: true, msg: 'Akun anda berhasil didaftarkan'})  
-            this.$router.replace('/sign-up')
             console.log(user)
+            this.gotoLogin()
         },  (err) => {
             this.msg = err.message
-            // this.popUpMessage()
-        })
-      },
-      popUpMessage() {
-        this.$bvModal.msgBoxOk(this.boxMsg, {
-          title: 'Status',
-          size: 'sm',
-          buttonSize: 'sm',
-          okVariant: 'success',
-          headerClass: 'p-2 border-bottom-0',
-          footerClass: 'p-2 border-top-0',
-          centered: true
         })
       },
       gotoLogin() {
+        // ganti halaman ke login
         this.$router.replace('/login')
       }
   }
@@ -99,6 +89,7 @@ export default {
         margin-top: 20px;
         width: 10%;
         cursor: pointer;
+        padding: 0 50px 0 50px;
     }
     p {
         margin-top: 40px;
@@ -114,4 +105,4 @@ export default {
       justify-content: center;
       align-items: center;
     }
-</style>
+  </style>

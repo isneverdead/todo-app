@@ -104,15 +104,6 @@ export default {
         nextRoute() {
             return this.$route.query.redirect || '/login'
         },
-        icono() {
-            if(this.todo.completed) {
-                this.icon = 'fa fa-square'
-            } else {
-                this.icon = 'fa fa-check'
-            }
-            return this.icon
-        }
-        
     },
     mounted() {
         if (this.currentUser == null) {
@@ -196,9 +187,6 @@ export default {
             this.todos.forEach((todo) => {
                 if (todo.completed) this.removeTodo(todo.id)
             })
-        },
-        finishedEdit(data) {
-            this.todos.splice(data.index, 1, data.todo)
         },
         signOut() {
             auth.signOut()

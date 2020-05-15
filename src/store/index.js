@@ -5,8 +5,11 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+    // user untuk menyimpan data user yang sedang login
     user: null,
+    // loading untuk menampilkan loading saat main.js sedang mangambil informasi user
     loading: true,
+    // untuk menampilkan popup notifikasi
     modal: {
       status: false,
       msg: null

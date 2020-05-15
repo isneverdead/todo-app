@@ -1,14 +1,16 @@
 <template>
   <div>
-  
+    <!-- Jika data user yang berada di VueX masih 'null' status loading akan menjadi true, dan loading akan ditampilkan -->
+    <!-- Animasi Loading -->
     <div v-if="$store.state.loading" class="lds-ring">
       <div></div><div></div><div></div><div></div>
     </div>
 
+    <!-- Form Login  -->
     <div v-else>
         <div class="login">
           <img alt="Vue logo" src="../assets/logo.png">
-          <h2>Sign in</h2>
+          <h2 style="margin: 20px 0 20px 0; font-size: 2.5em">Sign in</h2>
           <div class="tile is-vertical is-4" @keyup.enter="login">
           <b-field label="Email">
               <b-input type="email"
@@ -28,31 +30,39 @@
                   maxlength="30">
               </b-input>
           </b-field>
+
+          <!-- Menampilkan pesan error dari firebase  -->
           <b-message type="is-danger" v-if="error">
             {{ error }}
           </b-message>
           </div>
-          <button v-if="!loadingButton" @click="login" class="button is-success is-outlined">Login</button>
+          <!-- Jika sedang proses login, maka akan menampilkan animasi tombol login  -->
+          <button v-if="!loadingButton" @click="login" class="button is-success is-small is-outlined">Login</button>
           <button v-else class="button is-success is-small is-loading">Loading</button>
-          
         </div>
+        <h5 style="margin: 10px 0 0 0;" >or</h5>  
         <section id="firebaseui-auth-container"></section>
-        <button @click="showFirebaseUi" class="button is-small is-success is-outlined">Firebase UI</button>
-          <p>Dont have account? daftar disini <button @click="gotoSignUp" class="button is-small is-success is-outlined">Register</button> </p>
+        <button @click="showFirebaseUi" class="button is-small is-success is-outlined">Login With...</button>
+        
+          <p>Dont have account?</p>
+          <button @click="gotoSignUp" class="button is-small is-success is-outlined">Register</button>
+        
     </div>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
-// import { firebase } from '../firebaseSetting'
+// import firebase auth 
 import * as firebase from 'firebase/app'
 import 'firebase/auth'
-// import firebaseui from 'firebaseui'
+// import firebase UI login
 import 'firebaseui/dist/firebaseui.css'
 var firebaseui = require('firebaseui')
+
 var ui = new firebaseui.auth.AuthUI(firebase.auth())
+
+// kongfigurasi firebase UI 
 var uiConfig = {
   callbacks: {
     signInSuccessWithAuthResult: function(authResult, redirectUrl) {
@@ -64,14 +74,17 @@ var uiConfig = {
     uiShown: function() {
       // The widget is rendered.
       // Hide the loader.
-      document.getElementById('loader').style.display = 'none';
+      // document.getElementById('loader').style.display = 'none';
     }
   },
   // Will use popup for IDP Providers sign-in flow instead of the default, redirect.
   signInFlow: 'popup',
-  signInSuccessUrl: '<url-to-redirect-to-on-success>',
+
+  // signInSuccessUrl (url redirect) bisa dimatikan saja
+
+  // signInSuccessUrl: '<url-to-redirect-to-on-success>',
   signInOptions: [
-    // Leave the lines as is for the providers you want to offer your users.
+    // list provider yang akan digunakan (disable yang tidak perlu)
     firebase.auth.GoogleAuthProvider.PROVIDER_ID,
     // firebase.auth.FacebookAuthProvider.PROVIDER_ID,
     // firebase.auth.TwitterAuthProvider.PROVIDER_ID,
@@ -79,25 +92,28 @@ var uiConfig = {
     firebase.auth.EmailAuthProvider.PROVIDER_ID,
     firebase.auth.PhoneAuthProvider.PROVIDER_ID
   ],
-  // Terms of service url.
-  tosUrl: '<your-tos-url>',
-  // Privacy policy url.
-  privacyPolicyUrl: '<your-privacy-policy-url>'
-}
-import { mapGetters, mapMutations } from 'vuex'
 
+  // dibawah ini di disable saja jika tidak punya 
+  // Terms of service url.
+  // tosUrl: '<your-tos-url>',
+  // Privacy policy url.
+  // privacyPolicyUrl: '#'
+}
+
+// import map getters dan map mutations dari vuex
+import { mapGetters, mapMutations } from 'vuex'
 
 export default {
   name: 'Login',
-  components: {
-    HelloWorld,
-  },
+  
   computed: {
     ...mapGetters({
+      // ambil data user 
       currentUser: 'lihatUser',
     }),
+    // untuk redirect ke halaman home 
     nextRoute() {
-        return this.$route.query.redirect || '/dashboard'
+        return this.$route.query.redirect || '/'
     }
   },
   data() {
@@ -110,6 +126,7 @@ export default {
         }
   },
   watch: {
+    // melihat perubahan di variabel 'currentUser' jika ada perubahan, maka akan melakukan redirect 
     currentUser(auth) {
       if (auth) {
         this.$router.replace(this.nextRoute)
@@ -117,16 +134,21 @@ export default {
     }
   },
   methods: {
+      // untuk memunculkan firebase UI login 
       showFirebaseUi() {
         ui.start('#firebaseui-auth-container', uiConfig)
       },
       login() {
+        // mengubah loadingButton menjadi 'true'
         this.loadingButton = true
+        // melakukan sign in ke firebase 
         firebase.auth()
         .signInWithEmailAndPassword(this.email, this.password)
         .then(
           (user) => {
+            // mengarahkan ke halaman home
             this.$router.replace({name: 'Home' })
+            // mengisi 
             this.$store.commit('updateModal', {status: true, msg: 'login berhasil'})
         },(err) => {
             this.error = err.message
@@ -157,6 +179,7 @@ export default {
         margin-top: 20px;
         width: 10%;
         cursor: pointer;
+        padding: 0 50px 0 50px;
     }
     p {
         margin-top: 40px;
@@ -166,7 +189,7 @@ export default {
         text-decoration: underline;
         cursor: pointer;
     }
-
+   
 
 
 
