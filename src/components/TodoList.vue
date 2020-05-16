@@ -1,30 +1,35 @@
 <template>
   <div class="container">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.min.css">
-    <h1>Vue ToDo List</h1>
-    
+        <h1 style="font-size: 2rem" >Todo List</h1>    
+
+        <!-- input todo  -->
     <input type="text" class="todo-input" placeholder="What's your plan?"
     v-model="todo" @keyup.enter="addTodo">    
+
+                    <!-- jika ingin menggunakan animasi, bisa gunakan kode dibawah ini -->
     <!-- <transition-group name="fade" enter-active-class="animated fadeInUp faster" leave-active-class="animated fadeOutDown fast"> -->
     <transition-group name="fade">
         <div  class="todo-item" v-for="todo in todosFiltered" :key="todo.id" >
         
             <div class="todo-item-left">
+                <!-- tombol centang todo  -->
                 <button class="todo-item-label" @click="check(todo)">
                     <i v-if="todo.completed" class="gg-check"  aria-hidden="true"></i>
                     <i v-else class="gg-shape-circle" aria-hidden="true"></i>
                     </button>
-                <!-- <input @click="check(todo)" type="checkbox" v-model="todo.completed" > -->
-                
+
+                    <!-- menampilkan todo ketika todo.completed  == false      -->
                 <div v-if="!todo.editing" @dblclick="editTodo(todo)" 
                 class="todo-item-label" :class="{ completed : todo.completed }">{{ todo.title }}</div>
-                
+                    <!-- menampilkan todo jika todo.completed == true  -->
                 <input v-else class="todo-item-edit" type="text" 
                 v-model="todo.title" @blur="doneEdit(todo)" 
                 @keyup.enter="doneEdit(todo)" @keyup.esc="cancelEdit(todo)"
                 v-focus>
             </div>
-            
+
+                <!-- remove todo  -->
             <div class="remove-item" @click="removeTodo(todo.id)">
                 &times;
             </div>    
@@ -32,6 +37,7 @@
         </div>
     </transition-group>
 
+    <!-- tombol check all  -->
     <div class="extra-container">
         <div><label>
             <button class="check-all" :class="{ active: checkAll }" @click="checkAllTodos">Check All</button>
@@ -39,18 +45,21 @@
         <div>{{ remaining }} item left</div>
     </div>
 
+    <!-- tombol filter todo  -->
     <div class="extra-container">
         <div>
+            <!-- :class="{ active: filter == 'all' }" adalah  style akan digunakan jika variabel filter == all -->
             <button :class="{ active: filter == 'all' }" @click="filter = 'all'">All</button>
             <button :class="{ active: filter == 'active' }" @click="filter = 'active'">Active</button>
             <button :class="{ active: filter == 'completed' }" @click="filter = 'completed'">Completed</button>
         </div>
-
+    <!-- tombol clear completed  -->
         <div> 
             <button v-if="showClearCompletedButton" @click="clearCompleted">Clear Completed</button>
         </div>
     </div>
-
+    
+    <!-- tombol sign out  -->
     <div>
         <button @click="signOut" class="button is-success is-outlined">logout</button>
     </div>
@@ -58,12 +67,14 @@
 </template>
 
 <script>
+// import firebase
 import { db, auth } from '../firebaseSetting'
+// import mapGetters dari vuex 
 import { mapGetters } from 'vuex'
 
 export default {
   name: 'TodoList',
-  
+    // tempat manaruh variabel / data
   data () {
     return {
         todo: '',
@@ -74,18 +85,18 @@ export default {
         filter: 'all',
         }
     },
+    // fetch todos menggunakan firebase properties
     firestore: {
-        todos: db.collection('todos').orderBy('created'),
-        
-
+        todos: db.collection('todos').orderBy('created') // orderBy('created') urutkan berdasarkan waktu dibuat
     },
+
+    // computed properties fungsinya untuk me-return jika ada terjadi perubahan perubahan data pada variabel
     computed: {
+        // return todos yang belum completed
         remaining() {
             return this.todos.filter(todo => !todo.completed).length
         },
-        anyRemaining() {
-            return this.remaining == 0
-        },
+        // me return todos berdasarkan filter
         todosFiltered() {
             if (this.filter == 'all') {
                 return this.todos
@@ -95,22 +106,28 @@ export default {
                 return this.todos.filter(todo => todo.completed)
             }
         },
+        // menampilkan clearCompletedButton jika ada todo yang sudah completed 
         showClearCompletedButton() {
             return this.todos.filter(todo => todo.completed).length > 0
         },
+        // mengambil informasi data user yang sedang login dari vuex
         ...mapGetters({
             currentUser: 'lihatUser'
         }),
+        // mengarahkan ke halaman login
         nextRoute() {
             return this.$route.query.redirect || '/login'
         },
     },
+    // mounted properties adalah jika halaman sudah ter-load maka perintah perintah akan ter eksekusi 
     mounted() {
+        // jika user tidak ada/ belum login, maka akan diarahkan ke halaman login
         if (this.currentUser == null) {
             this.$router.replace(this.nextRoute)
         }
         
     },
+    // ini untuk mengatur fokus kursor saat kita mengedit todos
     directives: {
         focus: {
             inserted: function (el) {
@@ -118,11 +135,15 @@ export default {
             }
         }
     },
+    // tempat kita menaruh function
     methods: {
+        // menambahkan todo
         addTodo() {
+            // jika todo == 0 maka todo tidak akan ditambahkan 
             if (this.todo.trim().length == 0) {
                 return
             }
+            // menambahkan todo ke dalam koleksi 'todos' 
             const ref = db.collection('todos').doc()
 
             ref.set({
@@ -132,12 +153,15 @@ export default {
                 editing: false,
                 created: new Date()
             })
+            // mengosongkan todo setelah berhasil di tambahkan ke firebase 
             this.todo = ''
         },
+        // meng enable kan status editing
         editTodo(todo) {
             this.beforeEditCache = todo.title
             todo.editing = true
         },
+        // menyimpan kembali todo yang sudah di update 
         doneEdit(todo) {
             if (todo.title.trim().length == 0) {
                 todo.title = this.beforeEditCache
@@ -151,13 +175,16 @@ export default {
                 created: todo.created
             })
         },
+        // tidak jadi edit, todo.title dikembalikan berdasarkan data yang disimpan ke variabel sementara 
         cancelEdit(todo) {
             todo.title = this.beforeEditCache
             todo.editing = false
         },
+        // menghapus todo 
         removeTodo(id) {
             db.collection('todos').doc(id).delete()
         },
+        // meng-check todo, mengubah status completed todo di firebase
         check(todo) {
             console.log("check : "+todo.completed)
             const ref = db.collection('todos').doc(todo.id)
@@ -169,6 +196,7 @@ export default {
                 created: todo.created
             })
         },
+        // meng-check semua todo 
         checkAllTodos() {
             this.checkAll = !this.checkAll
             this.todos.forEach((todo)=>{
@@ -183,11 +211,13 @@ export default {
                 })
             })
         },
+        // menghapus todo yang sudah completed 
         clearCompleted() {
             this.todos.forEach((todo) => {
                 if (todo.completed) this.removeTodo(todo.id)
             })
         },
+        // sign out user dari aplikasi kita 
         signOut() {
             auth.signOut()
             console.log("logout")
@@ -299,72 +329,4 @@ export default {
     }
 
 
-    @keyframes ldio-ski5n9k737b-1 {
-        0% { transform: rotate(0deg) }
-       50% { transform: rotate(-45deg) }
-      100% { transform: rotate(0deg) }
-    }
-    @keyframes ldio-ski5n9k737b-2 {
-        0% { transform: rotate(180deg) }
-       50% { transform: rotate(225deg) }
-      100% { transform: rotate(180deg) }
-    }
-    .ldio-ski5n9k737b > div:nth-child(2) {
-      transform: translate(-15px,0);
-    }
-    .ldio-ski5n9k737b > div:nth-child(2) div {
-      position: absolute;
-      top: 40.199999999999996px;
-      left: 40.199999999999996px;
-      width: 120.6px;
-      height: 60.3px;
-      border-radius: 120.6px 120.6px 0 0;
-      background: #2bde73;
-      animation: ldio-ski5n9k737b-1 1s linear infinite;
-      transform-origin: 60.3px 60.3px
-    }
-    .ldio-ski5n9k737b > div:nth-child(2) div:nth-child(2) {
-      animation: ldio-ski5n9k737b-2 1s linear infinite
-    }
-    .ldio-ski5n9k737b > div:nth-child(2) div:nth-child(3) {
-      transform: rotate(-90deg);
-      animation: none;
-    }@keyframes ldio-ski5n9k737b-3 {
-        0% { transform: translate(190.95px,0); opacity: 0 }
-       20% { opacity: 1 }
-      100% { transform: translate(70.35px,0); opacity: 1 }
-    }
-    .ldio-ski5n9k737b > div:nth-child(1) {
-      display: block;
-    }
-    .ldio-ski5n9k737b > div:nth-child(1) div {
-      position: absolute;
-      top: 92.46px;
-      left: -8.04px;
-      width: 16.08px;
-      height: 16.08px;
-      border-radius: 50%;
-      background: #ffd14f;
-      animation: ldio-ski5n9k737b-3 1s linear infinite
-    }
-    .ldio-ski5n9k737b > div:nth-child(1) div:nth-child(1) { animation-delay: -0.67s }
-    .ldio-ski5n9k737b > div:nth-child(1) div:nth-child(2) { animation-delay: -0.33s }
-    .ldio-ski5n9k737b > div:nth-child(1) div:nth-child(3) { animation-delay: 0s }
-    .loadingio-spinner-bean-eater-sebx2tpg1ah {
-      width: 201px;
-      height: 201px;
-      display: inline-block;
-      overflow: hidden;
-      background: none;
-    }
-    .ldio-ski5n9k737b {
-      width: 100%;
-      height: 100%;
-      position: relative;
-      transform: translateZ(0) scale(1);
-      backface-visibility: hidden;
-      transform-origin: 0 0; /* see note above */
-    }
-    .ldio-ski5n9k737b div { box-sizing: content-box; }
-    /* generated by https://loading.io/ */
 </style>
